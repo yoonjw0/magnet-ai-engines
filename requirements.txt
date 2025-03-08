@@ -1,0 +1,9 @@
+numpy
+pandas
+scikit-learn
+langchain-google-genai
+matplotlib
+networkx
+graphistry
+tqdm
+python-dotenv
