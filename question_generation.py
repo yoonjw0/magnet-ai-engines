@@ -206,8 +206,8 @@ class QuestionGenerationEngine:
         questions = json.loads(response.content)
         
         return [
-            {"question_id": f"q_1_{str(uuid.uuid4())[:8]}", "text": q, "is_selected": False}
-            for q in questions[:2]
+            {"question_id": f"q_1_00{i}", "text": q, "is_selected": False}
+            for i, q in enumerate(questions[:2], start=1)
         ]
     
     def generate_questions(self) -> List[Dict]:
@@ -256,8 +256,8 @@ class QuestionGenerationEngine:
         
         questions = json.loads(response.content)
         self.last_generated_questions = [
-            {"question_id": f"q_{self.current_turn_id + 1}_{str(uuid.uuid4())[:8]}", "text": q, "is_selected": False}
-            for q in questions[:2]  # 최대 2개의 질문만 사용
+            {"question_id": f"q_{self.current_turn_id + 1}_00{i}", "text": q, "is_selected": False}
+            for i, q in enumerate(questions[:2], start=1)  # 최대 2개의 질문만 사용
         ]
         return self.last_generated_questions
     
