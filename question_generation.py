@@ -25,7 +25,7 @@ class QuestionGenerationEngine:
         self.profiles = self._load_profiles()
         
         # Initialize the chat model
-        self.chat_model = ChatGoogleGenerativeAI(model="gemini-pro", 
+        self.chat_model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", 
                                               temperature=0.7)
     
     def _load_profiles(self):
