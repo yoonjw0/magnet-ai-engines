@@ -6,14 +6,14 @@
 ## 주요 기능
 - **QnA 대화 생성**: 사용자 맞춤형 질문 생성
 - **밋업 매칭 추천**: 사용자 프로필 기반 유사도 측정 및 추천
-- **시각화**: 다양한 방식의 관계 그래프 및 추천 결과 시각화
+- **시각화**: 사용자 중심 네트워크 그래프 시각화
 - **추천 설명 생성**: LLM을 활용한 맞춤형 추천 이유 설명
 - **가상 사용자 시뮬레이션**: 테스트를 위한 가상 사용자 생성 및 시뮬레이션
 
 ## 핵심 모듈
 - `simulation_virtual_users.py`: 가상 사용자 생성 및 시뮬레이션
 - `meetup_recommendation.py`: 밋업 매칭 시뮬레이션
-- `run_visualization.py`: 시각화 실행 스크립트
+- `streamlit_dashboard.py`: 대시보드 및 시각화 인터페이스
 - `visualization/`: 시각화 모듈 패키지
 
 ## 프로젝트 구조
@@ -22,22 +22,19 @@
 /
 ├── architecture_design/   # 아키텍처 설계 문서
 ├── data/                  # 데이터 파일
-│   └── profiles/          # 사용자 프로필 데이터
+│   ├── profiles/          # 사용자 프로필 데이터
+│   └── conversations/     # 사용자 대화 데이터
 ├── cached_data/           # 캐시 데이터 저장소
-├── visualization_results/ # 시각화 결과
-├── visualization_cache/   # 시각화 캐시 디렉토리
+├── logs/                  # 로그 파일
 ├── tests/                 # 테스트 코드
 ├── visualization/         # 시각화 패키지
 │   ├── __init__.py        # 패키지 초기화 파일
 │   ├── utils.py           # 유틸리티 함수
-│   ├── visualizer.py      # 메인 시각화 클래스
-│   ├── network_graphs.py  # 네트워크 그래프 시각화 모듈
-│   ├── feature_graphs.py  # 특성 그래프 시각화 모듈
-│   ├── embedding_viz.py   # 임베딩 시각화 모듈
-│   └── recommendation_viz.py # 추천 결과 시각화 모듈
+│   └── network_graphs.py  # 네트워크 그래프 시각화 모듈
 ├── simulation_virtual_users.py  # 가상 사용자 생성 및 시뮬레이션
 ├── meetup_recommendation.py     # 밋업 매칭 시뮬레이션
-└── run_visualization.py         # 시각화 실행 스크립트
+├── question_generation.py       # 질문 생성 엔진
+└── streamlit_dashboard.py       # 시각화 대시보드
 ```
 
 ## 시작하기
@@ -59,7 +56,7 @@ pip install -r requirements.txt
 
 # 환경 변수 설정
 cp .env.example .env
-# .env 파일에 API 키 입력
+# .env 파일에 Google AI Studio API 키 입력
 ```
 
 ### 사용 예시
@@ -70,96 +67,37 @@ from meetup_recommendation import MeetupRecommendationSystem
 recommender = MeetupRecommendationSystem()
 recommender.run_recommendation_pipeline()
 
-# 시각화 도구 사용
-from visualization import MeetupVisualization
+# 질문 생성 엔진 사용
+from question_generation import QuestionGenerationEngine
 
-visualizer = MeetupVisualization(recommender)
-visualizer.plot_force_directed_graph(n_users=50, threshold=0.75)
+engine = QuestionGenerationEngine()
+questions = engine.generate_questions()
 ```
 
-## 시각화 도구 사용하기
+## Streamlit 대시보드 실행하기
 
 ### 명령행에서 실행
 
 ```bash
-# 모든 시각화 생성
-python run_visualization.py --user 0 --n-users 50 --top-n 5
-
-# 특정 특성 기반 네트워크 시각화
-python run_visualization.py --feature "최근 대화" --threshold 0.7 --n-users 50
+# Streamlit 대시보드 실행
+streamlit run streamlit_dashboard.py
 ```
 
-### 코드에서 사용
+### 대시보드 기능
 
-```python
-from meetup_recommendation import MeetupRecommendationSystem
-from visualization import MeetupVisualization
-
-# 추천 시스템 인스턴스 생성
-recommender = MeetupRecommendationSystem()
-
-# 시각화 인스턴스 생성
-visualizer = MeetupVisualization(recommender=recommender)
-
-# 포스 다이렉트 그래프 생성
-force_graph = visualizer.plot_force_directed_graph(
-    n_users=50, 
-    threshold=0.75,
-    min_connections=2
-)
-
-# 인터랙티브 포스 다이렉트 그래프 생성
-interactive_force_graph = visualizer.plot_interactive_force_directed_graph(
-    n_users=50, 
-    threshold=0.75,
-    min_connections=2
-)
-
-# 특성별 유사도 분포 시각화
-feature_dist = visualizer.plot_feature_similarity_distribution(
-    user_idx=0,
-    top_n=5
-)
-
-# 특정 특성 기반 네트워크 시각화
-feature_network = visualizer.plot_feature_specific_network(
-    feature_name="최근 대화",
-    n_users=50,
-    threshold=0.7
-)
-
-# 모든 시각화 생성 및 저장
-results = visualizer.generate_all_visualizations(
-    user_idx=0,
-    n_users=50,
-    top_n=5,
-    output_dir="visualization_results"
-)
-```
+1. **사용자 중심 네트워크 시각화**: 선택한 사용자를 중심으로 유사도가 높은 사용자들의 네트워크를 시각화합니다.
+2. **인터랙티브 네트워크 그래프**: Plotly를 사용한 인터랙티브 네트워크 그래프로 사용자 간 관계를 탐색할 수 있습니다.
+3. **유사도 필터링**: 유사도 임계값을 조정하여 다양한 수준의 연결을 시각화할 수 있습니다.
+4. **사용자 선택**: 다양한 사용자를 선택하여 각 사용자 중심의 네트워크를 확인할 수 있습니다.
 
 ## 시각화 유형
 
-1. **포스 다이렉트 그래프**: 사용자 간 유사도를 기반으로 한 네트워크 그래프
-2. **인터랙티브 포스 다이렉트 그래프**: 인터랙티브한 네트워크 그래프 (Plotly 사용)
-3. **특성별 유사도 분포**: 특성별 유사도 분포를 보여주는 바 차트
-4. **특성 기반 네트워크**: 특정 특성(예: 최근 대화)의 유사도만을 기반으로 한 네트워크 그래프
-5. **임베딩 시각화**: 사용자 임베딩을 2D 또는 3D 공간에 시각화
-6. **추천 결과 비교**: 추천 결과를 특성별로 비교하는 차트
-7. **추천 레이더 차트**: 추천 사용자의 특성을 레이더 차트로 비교
+1. **사용자 중심 네트워크 그래프**: 선택한 사용자를 중심으로 유사도가 높은 사용자들의 네트워크를 시각화합니다.
+2. **인터랙티브 사용자 중심 네트워크 그래프**: Plotly를 사용한 인터랙티브 네트워크 그래프로 사용자 간 관계를 탐색할 수 있습니다.
 
 ## 캐시 사용
 
-시각화 결과는 기본적으로 `visualization_cache` 디렉토리에 캐시됩니다. 캐시를 사용하지 않으려면 다음과 같이 설정합니다:
-
-```python
-visualizer = MeetupVisualization(recommender=recommender, use_cache=False)
-```
-
-또는 명령행에서:
-
-```bash
-python run_visualization.py --no-cache
-```
+Streamlit 대시보드는 기본적으로 계산 결과를 캐시하여 성능을 향상시킵니다. 캐시를 초기화하려면 대시보드 사이드바에서 '캐시 강제 초기화' 옵션을 선택하세요.
 
 ## 기여하기
 프로젝트 기여에 관한 문의는 프로젝트 관리자에게 연락해 주세요.
