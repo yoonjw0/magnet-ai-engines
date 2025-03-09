@@ -7,14 +7,15 @@ import os
 import random
 import concurrent.futures
 from tqdm import tqdm
+import uuid
 from dotenv import load_dotenv
 load_dotenv()
 
 # Update deprecated import
 from pydantic import BaseModel, Field
 class UserData(BaseModel):
-    user_id: str = Field(description="unique random UUID")
-    name: str = Field(description="name like real")
+    user_id: str = Field(description="blank")
+    name: str = Field(description="blank")
     age: int = Field(description="age, between 20 and 50")
     job_title: str = Field(description="job title")
     specialties: str = Field(description="specialties, comma separated")
@@ -24,11 +25,95 @@ class UserData(BaseModel):
     report_summary: str = Field(description="report summary")
     recent_conversation_history: str = Field(description="recent conversation history")
 
+# 한국 성씨 목록 (더 다양한 성씨 추가)
+surnames = [
+    "김", "이", "박", "최", "정", "강", "조", "윤", "장", "임", "한", "오", "서", "신", "권", 
+    "황", "안", "송", "전", "홍", "유", "고", "문", "양", "손", "배", "백", "허", "남", "심",
+    "노", "하", "곽", "성", "차", "주", "우", "구", "민", "유", "류", "나", "진", "지", "엄",
+    "채", "원", "천", "방", "공", "현", "함", "변", "염", "여", "추", "도", "소", "석", "선"
+]
+
+# 남자 이름 목록 (더 다양한 이름 추가)
+male_names = [
+    "민준", "서준", "도윤", "예준", "시우", "하준", "지호", "준서", "준우", "현우", 
+    "도현", "지훈", "건우", "우진", "민재", "현준", "선우", "서진", "연우", "정우",
+    "승우", "승현", "시윤", "준혁", "은우", "지환", "승민", "지우", "유준", "진우",
+    "시현", "지원", "민성", "준영", "재원", "윤우", "민규", "준호", "태윤", "재민",
+    "은찬", "한결", "윤호", "민호", "시원", "건호", "은호", "재윤", "지한", "태민"
+]
+
+# 여자 이름 목록 (더 다양한 이름 추가)
+female_names = [
+    "서연", "서윤", "지우", "민서", "하은", "하윤", "윤서", "지민", "지유", "채원", 
+    "지윤", "은서", "수아", "다은", "예은", "지아", "은우", "서현", "예린", "수빈",
+    "소율", "예원", "지원", "소윤", "지안", "하린", "채은", "가은", "윤아", "민지",
+    "유진", "세아", "예나", "은지", "수민", "혜원", "지은", "유나", "민주", "예진",
+    "주아", "시은", "아린", "서영", "연서", "다인", "다연", "은채", "아인", "서아"
+]
+
+# Global set to track used names
+used_names = set()
+
+def generate_unique_name(used_names):
+    """중복되지 않는 이름 생성"""
+    gender = random.choice(["male", "female"])
+    surname = random.choice(surnames)
+    
+    if gender == "male":
+        first_name = random.choice(male_names)
+    else:
+        first_name = random.choice(female_names)
+    
+    full_name = surname + first_name
+    
+    # 이미 사용된 이름이면 다시 생성
+    while full_name in used_names:
+        surname = random.choice(surnames)
+        if gender == "male":
+            first_name = random.choice(male_names)
+        else:
+            first_name = random.choice(female_names)
+        full_name = surname + first_name
+    
+    used_names.add(full_name)
+    return full_name
+
+
+# 직업 목록 (더 다양한 직업 추가)
+jobs = [
+    "데이터 과학자", "소프트웨어 엔지니어", "UX/UI 디자이너", "마케팅 매니저", "금융 컨설턴트",
+    "역사 교사", "푸드 스타일리스트", "소믈리에", "건축가", "영화 제작 PD", "AI 엔지니어",
+    "블록체인 개발자", "호텔 매니저", "벤처 투자자", "AI 윤리 컨설턴트", "도예가", "요리사",
+    "영양사", "수제 맥주 브루어", "투자 은행가", "역사학 교수", "고고학 연구원", "ESG 컨설턴트",
+    "창업 컨설턴트", "패션 디자이너", "자연어 처리 연구원", "스타트업 마케터", "금융 상품 개발자",
+    "부동산 투자 컨설턴트", "소셜 미디어 매니저", "큐레이터", "금융 애널리스트", "UX 리서치 전문가",
+    "게임 개발자", "웹 개발자", "모바일 앱 개발자", "클라우드 아키텍트", "사이버 보안 전문가",
+    "데이터 엔지니어", "그래픽 디자이너", "콘텐츠 크리에이터", "디지털 마케터", "SEO 전문가",
+    "제품 매니저", "프로젝트 매니저", "HR 컨설턴트", "법률 컨설턴트", "의료 정보 분석가"
+]
+
+# 관심사 목록 (더 다양한 관심사 추가)
+interests = [
+    "영화 감상", "여행", "요리", "와인", "독서", "음악 감상", "사진 촬영", "그림 그리기", "등산",
+    "캠핑", "수영", "요가", "명상", "테니스", "골프", "축구", "농구", "야구", "배드민턴", "볼링",
+    "스키", "스노보드", "서핑", "스케이트보드", "클라이밍", "낚시", "사이클링", "달리기", "마라톤",
+    "트레일 러닝", "크로스핏", "필라테스", "발레", "재즈 댄스", "힙합 댄스", "살사 댄스", "탱고",
+    "플라멩코", "기타 연주", "피아노 연주", "드럼 연주", "바이올린 연주", "첼로 연주", "플루트 연주",
+    "색소폰 연주", "트럼펫 연주", "하모니카 연주", "우쿨렐레 연주", "노래", "합창", "오페라 감상",
+    "클래식 음악 감상", "재즈 음악 감상", "록 음악 감상", "힙합 음악 감상", "팝 음악 감상", "인디 음악 감상",
+    "전자 음악 감상", "국악 감상", "뮤지컬 관람", "연극 관람", "발레 관람", "오페라 관람", "콘서트 관람",
+    "미술 전시회 관람", "박물관 방문", "역사 유적지 탐방", "문화재 답사", "건축물 탐방", "정원 방문",
+    "식물원 방문", "동물원 방문", "수족관 방문", "천문대 방문", "과학관 방문", "테마파크 방문", "놀이공원 방문",
+    "쇼핑", "패션", "뷰티", "인테리어", "가드닝", "원예", "반려동물 키우기", "반려식물 키우기", "DIY 공예",
+    "뜨개질", "자수", "퀼트", "도자기", "목공", "가죽 공예", "종이 공예", "캘리그라피", "레터링",
+    "스크랩북 만들기", "다이어리 꾸미기", "스티커 수집", "우표 수집", "동전 수집", "인형 수집", "피규어 수집"
+]
+
 # 1. 대표 유저 프로필 데이터 (recent_conversation_history를 Q/A 형태로 수정)
 representative_profiles = [
     {
-        "user_id": "b7f3c8d1-92e5-4d3f-9b8e-63f27f123456",
-        "name": "김민수",
+        "user_id": "",
+        "name": "",
         "age": 32,
         "job_title": "AI Engineer",
         "specialties": "AI 모델 최적화, MLOps, 데이터 분석",
@@ -54,8 +139,8 @@ representative_profiles = [
         )
     },
     {
-        "user_id": "user2-unique-id",
-        "name": "에스님",
+        "user_id": "",
+        "name": "",
         "age": 29,
         "job_title": "Data Scientist",
         "specialties": "데이터 분석, 머신러닝, 통계",
@@ -80,8 +165,8 @@ representative_profiles = [
         )
     },
     {
-        "user_id": "user3-unique-id",
-        "name": "엔멘토",
+        "user_id": "",
+        "name": "",
         "age": 35,
         "job_title": "Portfolio Consultant",
         "specialties": "포트폴리오 컨설팅, 문제 해결, 기획",
@@ -106,8 +191,8 @@ representative_profiles = [
         )
     },
     {
-        "user_id": "user4-unique-id",
-        "name": "정우",
+        "user_id": "",
+        "name": "",
         "age": 30,
         "job_title": "Software Developer",
         "specialties": "백엔드 개발, 클라우드 컴퓨팅, 시스템 아키텍처",
@@ -132,8 +217,8 @@ representative_profiles = [
         )
     },
     {
-        "user_id": "user5-unique-id",
-        "name": "박지은",
+        "user_id": "",
+        "name": "",
         "age": 28,
         "job_title": "Product Manager",
         "specialties": "제품 전략, UX/UI, 데이터 기반 의사결정",
@@ -164,11 +249,10 @@ example_prompt_template = """
 아래의 대표 유저 프로필 JSON 데이터를 참고하여 동일한 포맷으로 완전히 새롭고 독창적인 가상 유저 프로필을 생성해줘.
 
 중요: 이전에 생성된 프로필과 완전히 다른 프로필을 만들어야 합니다. 다음 사항을 반드시 지켜주세요:
-1. 이름은 다양한 성(김, 이, 박, 최, 정, 강, 조, 윤, 장, 임 등)과 이름을 사용하세요.
-2. 나이는 20-50 사이에서 다양하게 설정하세요. 같은 나이를 반복하지 마세요.
-3. 직업은 다양한 분야(IT, 금융, 교육, 의료, 예술, 엔터테인먼트, 요식업, 제조업 등)에서 선택하세요.
-4. 관심사와 기술도 직업에 맞게 다양하게 설정하세요.
-5. 대화 내용도 해당 직업과 관심사에 맞게 구성하세요.
+1. 나이는 20-50 사이에서 다양하게 설정하세요. 같은 나이를 반복하지 마세요.
+2. 직업은 다양한 분야({jobs})에서 선택하세요.
+3. 관심사와 기술도 직업에 맞게 다양하게 설정하세요. 관심사는 ({interests})를 참고하세요
+4. 대화 내용도 해당 직업과 관심사에 맞게 구성하세요.
 
 각 유저 프로필은 아래 필드를 포함해야 해:
 - user_id (유니크한 임의의 UUID)
@@ -192,7 +276,6 @@ example_prompt_template = """
 llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash-lite",
             temperature=1.0,  # 최대 온도 사용 (Gemini API는 0.0-1.0 범위만 허용)
-            convert_system_message_to_human=True,
             api_key=os.getenv('GOOGLE_API_KEY'),
         ).with_structured_output(UserData)
 
@@ -229,11 +312,11 @@ def retry_with_exponential_backoff(func, max_retries=5, initial_delay=1, max_del
 # 4. Function to generate a single user profile using Google Generative AI
 def generate_single_profile():
     def _generate_profile():
+        global used_names
         # Create a new LLM instance for each process to avoid sharing
         local_llm = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash-lite",
-            temperature=1.0,  # 최대 온도 사용 (Gemini API는 0.0-1.0 범위만 허용)
-            convert_system_message_to_human=True,
+            temperature=1.0,
             api_key=os.getenv('GOOGLE_API_KEY'),
         ).with_structured_output(UserData)
         
@@ -245,7 +328,12 @@ def generate_single_profile():
         custom_prompt = example_prompt_template
         if diversity_prompt_addition:
             custom_prompt += diversity_prompt_addition
-        prompt = custom_prompt.format(rep_profiles=rep_profiles_json)
+        # Format the prompt with all required placeholders
+        prompt = custom_prompt.format(
+            rep_profiles=rep_profiles_json,
+            jobs=', '.join(jobs),
+            interests=', '.join(interests)
+        )
         
         # Call API to generate a single profile
         # Since we're using structured output, this will directly return a UserData object
@@ -253,6 +341,9 @@ def generate_single_profile():
         
         # Convert the UserData object to a dictionary using the newer method
         profile = response.model_dump()
+        profile["name"] = generate_unique_name(used_names)
+        profile["user_id"] = str(uuid.uuid4())
+
         return profile
         
     try:
@@ -275,7 +366,7 @@ def generate_with_progress(total_profiles):
     # Keep track of active tasks to throttle submission
     active_tasks = set()
     completed_tasks = 0
-    
+    # used_names is now global, no need to redefine it here
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit initial batch of tasks
         for i in range(min(max_workers, total_profiles)):
@@ -325,7 +416,7 @@ total_profiles_to_generate = 100  # API 할당량을 고려하여 적은 수의 
 data_dir = 'data/profiles'
 os.makedirs(data_dir, exist_ok=True)
 
-generated_profiles_path = os.path.join(data_dir, 'generated_virtual_users.json')
+generated_profiles_path = os.path.join(data_dir, 'generated_virtual_users_v1.json')
 existing_profiles = []
 
 # 프롬프트 업데이트를 위한 변수 선언
