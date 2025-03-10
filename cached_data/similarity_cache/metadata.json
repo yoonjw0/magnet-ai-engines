@@ -1,3 +1,44 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:2422b893ae9000b1dacdbcc3f07329e0e59b296597d095d405212e374ccd5523
-size 1350
+{
+  "specialties": {
+    "feature": "specialties",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/specialties_similarity.json",
+    "timestamp": 1741473367.8406951
+  },
+  "interests": {
+    "feature": "interests",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/interests_similarity.json",
+    "timestamp": 1741473367.896992
+  },
+  "recent_conversation_history": {
+    "feature": "recent_conversation_history",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/recent_conversation_history_similarity.json",
+    "timestamp": 1741473367.94132
+  },
+  "work_culture": {
+    "feature": "work_culture",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/work_culture_similarity.json",
+    "timestamp": 1741473367.987145
+  },
+  "job_title": {
+    "feature": "job_title",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/job_title_similarity.json",
+    "timestamp": 1741473368.034901
+  },
+  "skills": {
+    "feature": "skills",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/skills_similarity.json",
+    "timestamp": 1741473368.0872939
+  },
+  "total_score": {
+    "feature": "total_score",
+    "user_count": 100,
+    "file_path": "cached_data/similarity_cache/total_score_similarity.json",
+    "timestamp": 1741623245.331928
+  }
+}

@@ -1,3 +1,44 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:dd851ea61527083a8aa8461c1adbafd465dd15300bd257b1fd76ae6b3f8aafcb
-size 1310
+{
+  "specialties": {
+    "feature": "specialties",
+    "user_count": 100,
+    "embedding_dim": 768,
+    "file_path": "cached_data/embedding_cache/specialties_embeddings.json",
+    "timestamp": 1741473090.156532
+  },
+  "skills": {
+    "feature": "skills",
+    "user_count": 100,
+    "embedding_dim": 768,
+    "file_path": "cached_data/embedding_cache/skills_embeddings.json",
+    "timestamp": 1741473144.9762712
+  },
+  "job_title": {
+    "feature": "job_title",
+    "user_count": 100,
+    "embedding_dim": 768,
+    "file_path": "cached_data/embedding_cache/job_title_embeddings.json",
+    "timestamp": 1741473201.02306
+  },
+  "work_culture": {
+    "feature": "work_culture",
+    "user_count": 100,
+    "embedding_dim": 768,
+    "file_path": "cached_data/embedding_cache/work_culture_embeddings.json",
+    "timestamp": 1741473256.887773
+  },
+  "interests": {
+    "feature": "interests",
+    "user_count": 100,
+    "embedding_dim": 768,
+    "file_path": "cached_data/embedding_cache/interests_embeddings.json",
+    "timestamp": 1741473312.203317
+  },
+  "recent_conversation_history": {
+    "feature": "recent_conversation_history",
+    "user_count": 100,
+    "embedding_dim": 768,
+    "file_path": "cached_data/embedding_cache/recent_conversation_history_embeddings.json",
+    "timestamp": 1741473367.669307
+  }
+}

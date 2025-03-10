@@ -31,9 +31,9 @@ graph TD
         U -->|Store Analysis| V["Conversation Analysis DB (PostgreSQL)"]
     end
 
-    %% 에이전트 계층 (밋업 퍼실리테이팅) - 하위 컴포넌트 서브그래프
-    subgraph "Meetup Facilitation Agent"
-        B -->|Process Meetup Facilitation| W["Meetup Facilitation Service"]
+    %% 에이전트 계층 (밋업 어시스턴트) - 하위 컴포넌트 서브그래프
+    subgraph "Meetup Assistant"
+        B -->|Process Meetup Assistant| W["Meetup Assistant Service"]
         W -->|Provide Guidance| X["Pre-Meetup Guidance"]
         W -->|Offer Advice| Y["In-Meetup Advice"]
         W -->|Check Satisfaction| Z["Satisfaction Check"]
@@ -62,7 +62,7 @@ graph TD
     K --> AC
     %% Conversation Service가 Matching Engine에 대화 데이터 제공
     I --> W
-    %% Monitoring Service가 Meetup Facilitation Service에 메트릭 제공
+    %% Monitoring Service가 Meetup Assistant Service에 메트릭 제공
     C --> AF
     %% System Controller가 Storage Proxy에 데이터 저장/접근
     K --> AF
