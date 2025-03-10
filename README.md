@@ -1,4 +1,5 @@
 # Magnet AI Engines
+#### Streamlit Cloud App [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://magnet-ai-engines-chfe8yraiws55ws4q66u3a.streamlit.app/)
 
 ## 프로젝트 개요
 이 저장소는 밋업 매칭 추천 시스템을 포함한 AI 엔진의 구현을 담고 있습니다. 사용자 프로필 기반의 유사도 측정을 통해 최적의 매칭을 추천하고, 이를 시각화하는 도구를 제공합니다.
@@ -19,7 +20,6 @@
 ## 프로젝트 구조
 
 ```
-/
 ├── architecture_design/   # 아키텍처 설계 문서
 ├── data/                  # 데이터 파일
 │   ├── profiles/          # 사용자 프로필 데이터
