@@ -39,21 +39,12 @@ st.title("밋업 추천 시스템 시각화 대시보드")
 # 사이드바 설정
 st.sidebar.header("설정")
 
-# 캐시 강제 초기화 여부 확인
-force_cache_reset = st.sidebar.checkbox("캐시 강제 초기화", False, key="force_cache_reset")
-
 # 추천 시스템 초기화
 @st.cache_resource
 def load_recommender(force_reset=False):
     st.sidebar.text("추천 시스템을 초기화하는 중...")
     recommender = MeetupRecommendationSystem(profiles_path="data/profiles/generated_virtual_users_v1.json")
-    
-    # 캐시 강제 초기화가 선택되었거나 유사도 행렬이 비어있는 경우
-    if force_reset:
-        st.sidebar.warning("캐시를 강제로 초기화합니다...")
-        recommender.run_recommendation_pipeline(overwrite_cache=True)
-        st.sidebar.success("유사도 행렬 계산이 완료되었습니다.")
-        return recommender
+    recommender.run_recommendation_pipeline(overwrite_cache=False)
     
     # 캐시된 유사도 행렬 로드
     similarity_cache_metadata = {}
@@ -77,15 +68,13 @@ def load_recommender(force_reset=False):
     # 캐시된 유사도 행렬이 없으면 계산
     if not recommender.feature_similarity_matrices:
         st.sidebar.warning("캐시된 유사도 행렬이 없습니다. 유사도 행렬을 계산합니다...")
-        recommender.run_recommendation_pipeline(overwrite_cache=False)
+        recommender.run_recommendation_pipeline(overwrite_cache=True)
         st.sidebar.success("유사도 행렬 계산이 완료되었습니다.")
     
     return recommender
 
 # 캐시 강제 초기화 여부에 따라 recommender 로드
-recommender = load_recommender(force_cache_reset)
-
-# 이미 위에서 recommender = load_recommender(force_cache_reset)로 수정했으므로 이 줄은 삭제
+recommender = load_recommender()
 
 # 특성 선택 (모든 탭에서 공통으로 사용)
 available_features = list(recommender.feature_similarity_matrices.keys())
@@ -128,11 +117,11 @@ st.session_state.selected_user_name = selected_user_name
 user_idx = user_name_to_idx[selected_user_name]
 
 # 사이드바 파라미터
-n_users = st.sidebar.slider("시각화할 사용자 수", 10, 100, 50)
+n_users = st.sidebar.slider("시각화할 사용자 수", 10, 100, 25)
 threshold = st.sidebar.slider("유사도 임계값", 0.0, 1.0, 0.7, 0.05)
 min_connections = st.sidebar.slider("최소 연결 수", 1, 10, 1)
 
-top_n = st.sidebar.slider("추천 사용자 수", 1, 20, 5)
+top_n = st.sidebar.slider("추천 사용자 수", 1, 20, 10)
 
 # 사이드바에 가중치 설정 추가
 st.sidebar.header("특성별 가중치 설정")
@@ -176,43 +165,6 @@ if st.sidebar.button("캐시 초기화", key="clear_cache_button"):
         if st.sidebar.checkbox("임베딩 캐시도 초기화", False, key="clear_embeddings_cache"):
             shutil.rmtree("cached_data/embeddings")
             st.sidebar.success("임베딩 캐시가 초기화되었습니다.")
-    st.rerun()
-
-# 유사도 행렬 직접 생성 옵션
-if st.sidebar.button("유사도 행렬 직접 생성", key="generate_similarity_matrices"):
-    st.sidebar.info("유사도 행렬을 직접 생성합니다...")
-    
-    # 유사도 범위 선택 (기본값을 0.5-1.0으로 설정)
-    sim_range = st.sidebar.slider("유사도 범위", 0.0, 1.0, (0.5, 1.0), 0.1, key="sim_range")
-    
-    # 특성별 유사도 행렬 생성 (영어 이름 사용)
-    n_users = len(recommender.profiles)
-    for feature in ['specialties', 'skills', 'job_title', 'work_culture', 'interests', 'recent_conversation_history']:
-        # 랜덤 유사도 행렬 생성 (사용자 지정 범위)
-        similarity_matrix = np.random.random((n_users, n_users)) * (sim_range[1] - sim_range[0]) + sim_range[0]
-        np.fill_diagonal(similarity_matrix, 1.0)  # 자기 자신과의 유사도는 1
-        
-        # 대칭 행렬로 만들기
-        similarity_matrix = (similarity_matrix + similarity_matrix.T) / 2
-        
-        # 저장
-        recommender.feature_similarity_matrices[feature] = similarity_matrix
-        
-        # JSON으로도 저장
-        json_file = os.path.join(recommender.embeddings_dir, f"{feature}_similarity.json")
-        similarity_dict = {
-            "feature": feature,
-            "shape": similarity_matrix.shape,
-            "mean": float(np.mean(similarity_matrix)),
-            "median": float(np.median(similarity_matrix)),
-            "min": float(np.min(similarity_matrix)),
-            "max": float(np.max(similarity_matrix)),
-            "matrix": similarity_matrix.tolist()
-        }
-        with open(json_file, 'w') as f:
-            json.dump(similarity_dict, f, indent=2)
-    
-    st.sidebar.success("유사도 행렬이 생성되었습니다.")
     st.rerun()
 
 # 탭 관리
@@ -314,7 +266,7 @@ with tab1:
             # 시각화 방식 선택
             viz_type = st.radio(
                 "시각화 방식",
-                ["일반", "인터랙티브"],
+                ["인터랙티브", "일반"],
                 horizontal=True,
                 key="viz_type_tab1"
             )
